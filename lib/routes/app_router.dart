@@ -1,0 +1,23 @@
+import 'package:flutter/material.dart';
+import 'package:fruit_hub/routes/app_route_name.dart';
+import 'package:fruit_hub/screens/splash.dart';
+
+String route = "";
+
+class AppRouter {
+  static Route onGenerateRoute(RouteSettings routeSettings) {
+    route = routeSettings.name ?? "";
+    return MaterialPageRoute(
+      settings: routeSettings,
+      builder: (BuildContext context) {
+        switch (routeSettings.name) {
+         
+          case AppRouteName.SPLASH_SCREEN_ROUTE:
+            return const SplashScreen();
+              default:
+            return Container();
+        }
+      },
+    );
+  }
+}
