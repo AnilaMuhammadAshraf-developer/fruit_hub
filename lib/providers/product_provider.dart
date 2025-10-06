@@ -29,4 +29,8 @@ class ProductProvider extends ChangeNotifier{
     isLoading = false;
     notifyListeners();
   }
+
+  void filterSearch(String query){
+    
+  }
 }
