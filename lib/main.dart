@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fruit_hub/providers/product_provider.dart';
 import 'package:fruit_hub/providers/user_provider.dart';
 import 'package:fruit_hub/routes/app_route_name.dart';
 import 'package:fruit_hub/routes/app_router.dart';
@@ -11,7 +12,8 @@ Future<void> main() async {
   runApp(
    MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),       
+        ChangeNotifierProvider(create: (_) => UserProvider()),     
+         ChangeNotifierProvider(create: (_) => ProductProvider()),    
       ],
       child: const MyApp(),
     ),

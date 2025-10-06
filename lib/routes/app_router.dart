@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fruit_hub/routes/app_route_name.dart';
+import 'package:fruit_hub/screens/authentication.dart';
+import 'package:fruit_hub/screens/home.dart';
 import 'package:fruit_hub/screens/splash.dart';
 import 'package:fruit_hub/screens/welcome.dart';
 
@@ -18,6 +20,12 @@ class AppRouter {
 
           case AppRouteName.WELCOME_SCREEN_ROUTE:
             return const WelcomeScreen();
+
+          case AppRouteName.AUTHENTICATION_SCREEN_ROUTE:
+            return  const AuthenticationScreen();
+          
+            case AppRouteName.HOME_SCREEN_ROUTE:
+            return  HomeScreen();
               default:
             return Container();
         }

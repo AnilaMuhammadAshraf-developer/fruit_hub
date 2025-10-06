@@ -4,13 +4,13 @@ import 'package:fruit_hub/utils/app_color.dart';
 
 class CustomButton extends StatelessWidget{
   final String btnTitle;
-  final Function() onClick;
+  final Function(BuildContext) onClick;
   const CustomButton({super.key, required this.btnTitle,required this.onClick});
   
   @override
   Widget build(BuildContext context){
     return GestureDetector(
-      onTap: onClick,
+      onTap:()=>onClick(context),
         child: Container(
           padding: EdgeInsets.all(10.w),
       
