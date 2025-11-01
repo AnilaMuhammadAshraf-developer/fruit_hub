@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget{
       theme:ThemeData(
         scaffoldBackgroundColor: AppColor.appWhiteColor
       ),
-      initialRoute: AppRouteName.SPLASH_SCREEN_ROUTE,
+      initialRoute: AppRouteName.HOME_SCREEN_ROUTE,
       onGenerateRoute: AppRouter.onGenerateRoute, 
      
       

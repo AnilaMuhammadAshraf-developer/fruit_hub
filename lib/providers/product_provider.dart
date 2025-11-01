@@ -4,21 +4,31 @@ import 'package:flutter/material.dart';
 import 'package:fruit_hub/models/product.dart';
 import 'package:http/http.dart' as http;
 
-class ProductProvider extends ChangeNotifier{
-  bool isLoading = false;
-  List<Product> products = [];
+class ProductProvider extends ChangeNotifier {
+  final List<Product> _products = [];
+  List<Map<String, dynamic>> _categories = [];
+  List<Map<String, dynamic>> _backendCategories = [];
+
+  List<Product> get products =>_products;
+  List<Map<String, dynamic>> get categories =>_categories;
+  List<Map<String, dynamic>> get backendCategories =>_backendCategories;
+
+
+    
+
 
   Future<void> fetchProducts() async {
-    isLoading = true;
-    notifyListeners();
+
 
     final url = Uri.parse("https://fakestoreapi.com/products");
 
-    try {
+   try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         List data = json.decode(response.body);
-        products = data.map((item) => Product.fromJson(item)).toList();
+        _products
+          ..clear()
+          ..addAll(data.map((item) => Product.fromJson(item)).toList());
       } else {
         debugPrint("Error: ${response.statusCode}");
       }
@@ -26,11 +36,9 @@ class ProductProvider extends ChangeNotifier{
       debugPrint("Error fetching data: $e");
     }
 
-    isLoading = false;
-    notifyListeners();
+
+  
   }
 
-  void filterSearch(String query){
-    
-  }
+  void filterSearch(String query) {}
 }

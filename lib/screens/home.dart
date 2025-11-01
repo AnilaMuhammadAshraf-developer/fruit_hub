@@ -47,27 +47,38 @@ class HomeScreen extends StatelessWidget {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Search for fruit salad combos',
-                      hintStyle: TextStyle(color: AppColor.hintTextColor,fontSize:15),
+                      hintStyle: TextStyle(
+                        color: AppColor.hintTextColor,
+                        fontSize: 15,
+                      ),
                       filled: true,
                       fillColor: AppColor.appGreyColor,
-                      prefixIcon: const Icon(Icons.search,color:AppColor.hintTextColor ,),
-                      
-                      
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppColor.hintTextColor,
+                      ),
+
                       border: InputBorder.none,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.appGreyColor),
-                        borderRadius: BorderRadius.circular(12.r)
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColor.appGreyColor),
-                        borderRadius: BorderRadius.circular(12.r)
-                      )
+                        borderSide: BorderSide(color: AppColor.appGreyColor),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 filterContainer(),
               ],
+            ),
+            const SizedBox(height: 20),
+            Consumer<ProductProvider>(
+              builder: (context, counterProvider, child) {
+                return recommendedCombo(context, productProvider);
+              },
             ),
           ],
         ),
@@ -79,13 +90,85 @@ class HomeScreen extends StatelessWidget {
     return Container(
       width: 50.w,
       height: 56.w,
-      decoration: BoxDecoration(color: AppColor.searchFilterColor,
-      borderRadius: BorderRadius.circular(12.r)
+      decoration: BoxDecoration(
+        color: AppColor.searchFilterColor,
+        borderRadius: BorderRadius.circular(12.r),
       ),
-      
+
       child: IconButton(
         onPressed: () {},
         icon: Image.asset(AppAsset.filterIcon),
+      ),
+    );
+  }
+
+  Widget recommendedCombo(BuildContext context, productProvider) {
+    return Container(
+      height: 500.h,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColor.appGreyColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Recommended Combo"),
+          Container(
+            width: 50.w,
+            child: Divider(
+              color: AppColor.appMainColor,
+              thickness: 1,
+              height: 3,
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 100.h,
+            child: FutureBuilder(
+              future: productProvider.fetchProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColor.appMainColor,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else {
+                  print("this is products: ${snapshot.data}");
+                  final products = productProvider.products;
+                  if (products.isEmpty) {
+                    return const Center(child: Text("No products found"));
+                  }
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        padding: EdgeInsets.all(12.r),
+                        decoration: BoxDecoration(
+                          border: Border.all(color:Colors.black)
+                        ),
+                        child: Column(
+                          children: [
+                            Text(products[index].title),
+                            Image.network(
+                              products[index].image,
+                              width: 50.w,
+                              height: 50.h,
+                              fit: BoxFit.cover,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
