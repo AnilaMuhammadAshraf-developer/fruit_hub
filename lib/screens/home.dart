@@ -9,10 +9,55 @@ import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+ 
+ Widget getProducts(ProductProvider productProvider) {
+  return FutureBuilder(
+    future: productProvider.fetchProducts(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(
+          child: CircularProgressIndicator(
+            color: AppColor.appMainColor,
+          ),
+        );
+      } else if (snapshot.hasError) {
+        return Center(child: Text("Error: ${snapshot.error}"));
+      } else {
+     
+        final products = productProvider.products;
+
+        if (products.isEmpty) {
+          return const Center(child: Text("No products found"));
+        }
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return ProductCard(
+              imageUrl: product.image,
+              title: product.title,
+              price: product.price,
+              onFavoriteTap: () {
+                print("favourite tap here");
+              },
+              onAddTap: () {
+                print("add tap here");
+              },
+            );
+          },
+        
+        );
+      }
+    },
+  );
+}
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final productProvider = Provider.of<ProductProvider>(context);
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColor.appWhiteColor,
@@ -87,6 +132,12 @@ class HomeScreen extends StatelessWidget {
                 return recommendedCombo(context, productProvider);
               },
             ),
+             SizedBox(height:7.h),
+              Consumer<ProductProvider>(
+            builder: (context, productProvider, child) {
+              return  tabContainer(productProvider);
+            }),
+            SizedBox(height:10.h)
           ],
         ),
       ),
@@ -112,7 +163,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget recommendedCombo(BuildContext context, productProvider) {
     return Container(
-      height: 500.h,
+      height: 270.h,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
       
@@ -121,29 +172,7 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
-          Expanded(
-          child: FutureBuilder(
-              future: productProvider.fetchProducts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColor.appMainColor,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                } else {
-                  print("this is products: ${snapshot.data}");
-                  final products = productProvider.products;
-                  if (products.isEmpty) {
-                    return const Center(child: Text("No products found"));
-                  }
-                  return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
+           Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.r),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,27 +192,21 @@ class HomeScreen extends StatelessWidget {
           ],)
           
         ),
+          
+          SizedBox(
+           height: 235.h,
+         
+          child:getProducts(productProvider),
+        ),
       
         
-          const SizedBox(height: 10),
+     
        
-        SizedBox(
-           height: 250.h,
-         
-          child:ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                 
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      return ProductCard(imageUrl:products[index].image, title: products[index].title, price:products[index].price, onFavoriteTap: () { print("favourite tap here"); }, onAddTap: () { print("add tap here"); },);
-                    })
-        ),
-      ],
-                  );
-                }
-              }
-          ),
-          ),
+       
+              
+            
+          
+          
         ],
       ),
                    
@@ -238,4 +261,40 @@ class HomeScreen extends StatelessWidget {
                 }})
     );
   }
+
+  Widget tabContainer(productProvider) {
+  return SizedBox(
+    height: 266.h,
+   child:DefaultTabController(
+      
+      length: 3,
+      child: Column(
+        children: [
+          const TabBar(
+            dividerColor: AppColor.appWhiteColor,
+            unselectedLabelColor: Color(0xff253F66),
+            indicatorColor: AppColor.appMainColor,
+            tabs: [
+              Tab(text: 'Hottest'),
+              Tab(text: 'Popular'),
+              Tab(text: 'New Combo'),
+            ],
+          ),
+           Expanded(
+            child: TabBarView(
+              children: [
+             getProducts(productProvider),
+              getProducts(productProvider),
+                   getProducts(productProvider),
+        
+              ],
+            ),
+          ),
+        ],
+      ),
+    
+    )
+  );
+}
+
 }
