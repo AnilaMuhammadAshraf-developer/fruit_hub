@@ -6,4 +6,5 @@ class AppColor {
   static const Color appGreyColor = Color.fromARGB(255, 239, 237, 237);
   static const Color searchFilterColor = Color(0xFFF7F7FC);
   static const Color hintTextColor = Color(0xFFB4B4C0);
+    static const Color homeBGColor = Color(0xFFF8F8F8);
 }

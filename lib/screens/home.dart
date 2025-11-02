@@ -4,6 +4,7 @@ import 'package:fruit_hub/providers/product_provider.dart';
 import 'package:fruit_hub/providers/user_provider.dart';
 import 'package:fruit_hub/utils/app_asset.dart';
 import 'package:fruit_hub/utils/app_color.dart';
+import 'package:fruit_hub/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -32,7 +33,9 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Container(
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+      child:Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.all(12.w),
@@ -74,15 +77,20 @@ class HomeScreen extends StatelessWidget {
                 filterContainer(),
               ],
             ),
+            const SizedBox(height:10),
+            Consumer<ProductProvider>(builder:(context,productProvider,child){
+             return categories(productProvider);
+            }),
             const SizedBox(height: 20),
             Consumer<ProductProvider>(
-              builder: (context, counterProvider, child) {
+              builder: (context, productProvider, child) {
                 return recommendedCombo(context, productProvider);
               },
             ),
           ],
         ),
       ),
+      )
     );
   }
 
@@ -107,24 +115,15 @@ class HomeScreen extends StatelessWidget {
       height: 500.h,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        border: Border.all(color: AppColor.appGreyColor),
+      
+        
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Recommended Combo"),
-          Container(
-            width: 50.w,
-            child: Divider(
-              color: AppColor.appMainColor,
-              thickness: 1,
-              height: 3,
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 100.h,
-            child: FutureBuilder(
+          
+          Expanded(
+          child: FutureBuilder(
               future: productProvider.fetchProducts(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -141,35 +140,102 @@ class HomeScreen extends StatelessWidget {
                   if (products.isEmpty) {
                     return const Center(child: Text("No products found"));
                   }
-                  return ListView.builder(
+                  return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.r),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+            "Recommended Combo",
+            style: TextStyle(fontSize: 16.sp,),
+          ),
+            Container(
+            width: 50.w,
+            child: Divider(
+              color: AppColor.appMainColor,
+              thickness: 1,
+              height: 3,
+            ),
+          ),
+          ],)
+          
+        ),
+      
+        
+          const SizedBox(height: 10),
+       
+        SizedBox(
+           height: 250.h,
+         
+          child:ListView.builder(
                     scrollDirection: Axis.horizontal,
+                 
                     itemCount: products.length,
                     itemBuilder: (context, index) {
-                      return Container(
-                        padding: EdgeInsets.all(12.r),
-                        decoration: BoxDecoration(
-                          border: Border.all(color:Colors.black)
-                        ),
-                        child: Column(
-                          children: [
-                            Text(products[index].title),
-                            Image.network(
-                              products[index].image,
-                              width: 50.w,
-                              height: 50.h,
-                              fit: BoxFit.cover,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                      return ProductCard(imageUrl:products[index].image, title: products[index].title, price:products[index].price, onFavoriteTap: () { print("favourite tap here"); }, onAddTap: () { print("add tap here"); },);
+                    })
+        ),
+      ],
                   );
                 }
-              },
-            ),
+              }
+          ),
           ),
         ],
       ),
+                   
+        
+       
+    );
+  }
+
+
+  Widget categories(productProvider){
+    return SizedBox(
+      height: 60.h,
+      child: FutureBuilder(
+              future: productProvider.fetchCategories(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColor.appMainColor,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else {
+                  print("this is products: ${snapshot.data}");
+                  final categories = productProvider.backendCategories;
+                  if (categories.isEmpty) {
+                    return const Center(child: Text("No categories found."));
+                  }
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount:categories.length ,
+                    itemBuilder:(context,index){
+                     var item=categories[index];
+                     return Container(
+                      margin: EdgeInsets.all(8.w),
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(color: AppColor.appWhiteColor,
+                      borderRadius: BorderRadius.circular(8.r),
+                       boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2, 
+                          blurRadius: 7, 
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                      ),
+                      child:Text(item)
+                     );
+                  });
+                }})
     );
   }
 }
